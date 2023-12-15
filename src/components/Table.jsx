@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
 function TableHeader() {
   return (
     <thead>
@@ -10,7 +13,24 @@ function TableHeader() {
   );
 }
 
-const TableBody = (props) => {
+const Table = (props) => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  const fetchData = () => {
+    axios
+      .get('/api/favlinks') // Assuming your GET route is defined in /api/favlinks in db.js
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error.message);
+      });
+  };
+
+  const TableBody = (props) => {
   const rows = props.linkData.map((row, index) => (
     <tr key={index}>
       <td>{row.name}</td>
@@ -24,9 +44,7 @@ const TableBody = (props) => {
   ));
 
   return <tbody>{rows}</tbody>;
-};
-
-function Table(props) {
+  };
   const handleRemove = (index) => {
     // Call the parent component's removeLink function with the index
     props.removeLink(index);
@@ -38,6 +56,5 @@ function Table(props) {
       <TableBody linkData={props.data} removeLink={handleRemove} />
     </table>
   );
-}
-
+};
 export default Table;
